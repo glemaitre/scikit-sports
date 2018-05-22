@@ -4,7 +4,7 @@ The :mod:`sksports.utils` module include utility functions.
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
 #          Cedric Lemaitre
-# License: BSD 3 clause
+# License: MIT
 
 from .validation import validate_filenames
 

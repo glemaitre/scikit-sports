@@ -1,20 +1,8 @@
 #!/bin/bash
-# This script is meant to be called by the "install" step defined in
-# .travis.yml. See http://docs.travis-ci.com/ for more details.
-# The behavior of the script is controlled by environment variabled defined
-# in the .travis.yml in the top level folder of the project.
-
-# License: 3-clause BSD
-
-# Travis clone scikit-learn/scikit-learn repository in to a local repository.
-# We use a cached directory with three scikit-learn repositories (one for each
-# matrix entry) from which we pull from local Travis repository. This allows
-# us to keep build artefact for gcc + cython, and gain time
+# License: MIT
 
 set -e
 
-# Fix the compilers to workaround avoid having the Python 3.4 build
-# lookup for g++44 unexpectedly.
 export CC=gcc
 export CXX=g++
 
@@ -43,8 +31,6 @@ if [[ "$DISTRIB" == "conda" ]]; then
     export PATH=$MINICONDA_PATH/bin:$PATH
     conda update --yes conda
 
-    # Configure the conda environment and put it in the path using the
-    # provided versions
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
     conda install --yes numpy scipy pandas six joblib scikit-learn cython
@@ -66,7 +52,6 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
 
 fi
 
-# check the version that have been installed
 python --version
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"

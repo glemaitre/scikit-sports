@@ -9,7 +9,7 @@ This example shows how to plot the information read with the function
 """
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# License: BSD 3 clause
+# License: MIT
 
 print(__doc__)
 

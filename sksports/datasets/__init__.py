@@ -4,7 +4,7 @@ The :mod:`sksports.datasets` module includes utilities to load datasets.
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
 #          Cedric Lemaitre
-# License: BSD 3 clause
+# License: MIT
 
 from os import listdir
 from os.path import dirname, join

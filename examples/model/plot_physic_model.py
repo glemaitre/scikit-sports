@@ -11,7 +11,7 @@ to a cyclist to infer power produced by a cyclist.
 print(__doc__)
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# License: BSD 3 clause
+# License: MIT
 
 ###############################################################################
 # We can first grab a file and read all data available

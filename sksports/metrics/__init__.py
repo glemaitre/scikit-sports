@@ -4,7 +4,7 @@ The :mod:`sksports.metrics` module include score functions.
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
 #          Cedric Lemaitre
-# License: BSD 3 clause
+# License: MIT
 
 from .activity import normalized_power_score
 from .activity import intensity_factor_score

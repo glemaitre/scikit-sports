@@ -31,7 +31,7 @@ files.
 # Author: Arthur Mensch <arthur.mensch@inria.fr>
 # Author: Raghav R V <rvraghav93@gmail.com>
 #
-# License: BSD 3 clause
+# License: MIT
 # see http://github.com/scikit-learn/scikit-learn
 
 

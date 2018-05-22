@@ -9,7 +9,7 @@ cycling data. We also show how to export the data using pandas.
 """
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# License: BSD 3 clause
+# License: MIT
 
 print(__doc__)
 

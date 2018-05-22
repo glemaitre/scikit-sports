@@ -4,7 +4,7 @@ The :mod:`sksports.io` module includes utility to load data.
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
 #          Cedric Lemaitre
-# License: BSD 3 clause
+# License: MIT
 
 from .base import bikeread
 

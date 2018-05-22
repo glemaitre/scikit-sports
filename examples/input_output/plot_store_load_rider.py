@@ -11,7 +11,7 @@ This example illustrates how to store the information contained in a
 print(__doc__)
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# License: BSD 3 clause
+# License: MIT
 
 ###############################################################################
 # We will use the :class:`sksports.Rider` class to compute power-profile for

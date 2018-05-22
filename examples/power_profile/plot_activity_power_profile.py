@@ -9,7 +9,7 @@ activity. We will also show how to plot those information.
 """
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# License: BSD 3 clause
+# License: MIT
 
 print(__doc__)
 

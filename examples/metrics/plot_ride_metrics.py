@@ -13,7 +13,7 @@ cyclist during a cycling ride.
 print(__doc__)
 
 # Authors: Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# License: BSD 3 clause
+# License: MIT
 
 ###############################################################################
 # We can first read a toy ride from the library
