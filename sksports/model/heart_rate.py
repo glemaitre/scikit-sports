@@ -7,6 +7,7 @@
 from __future__ import division
 
 import numpy as np
+import pandas as pd
 from scipy.optimize import leastsq, minimize
 
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -14,19 +15,58 @@ from sklearn.utils import check_X_y, check_array
 from sklearn.utils.validation import check_is_fitted
 
 
-def _model(power, hr_rest, hr_max, hr_slope, hr_drift, rate_growth,
-           rate_decay):
-    """Model to predict heart-rate from power data."""
+def exp_heart_rate_model(power, hr_start, hr_max, hr_slope, hr_drift,
+                         rate_growth, rate_decay):
+    """Model heart-rate from power date based on exponential
+    physiological-based model.
+
+    Parameters
+    ----------
+    power : ndarray, shape (n_samples,)
+        The power data in watts.
+
+    hr_start : float
+        Initial heart-rate frequency.
+
+    hr_max : float
+        Heart-rate frequency of the athlete at maximum.
+
+    hr_slope : float
+        Slope considered if the model is linear. FIXME
+
+    hr_drift : float
+        Attenuation of the heart-rate other time. FIXME
+
+    rate_growth : float
+        Growth rate of the exponential when the power increases.
+
+    rate_decay : float
+        Decay rate of the exponential when the power decreases.
+
+    Returns
+    -------
+    hr_pred : ndarray, shape (n_samples,)
+        Prediction of the heart-rate frequencies associated to the power data.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> power = np.array([100] * 25 + [240] * 25 + [160] * 25)
+    >>> from sksports.model import exp_heart_rate_model
+    >>> hr_pred = exp_heart_rate_model(power, 75, 200, 0.30, 3e-5, 24, 30)
+    >>> print(hr_pred)
+
+    """
     power_corrected = power + power.cumsum() * hr_drift
-    hr_lin = power_corrected * hr_slope + hr_rest
+    hr_lin = power_corrected * hr_slope + hr_start
     hr_ss = np.minimum(hr_max, hr_lin)
 
     diff_hr = np.pad(np.diff(power_corrected), pad_width=1, mode='constant')
     rate = np.where((diff_hr <= 0), rate_decay, rate_growth)
 
-    hr_pred = np.ones(power.shape) * hr_rest
+    hr_pred = np.ones(power.shape) * hr_start
     for curr_idx in enumerate(hr_pred.size):
-        hr_prev = hr_pred[curr_idx] if curr_idx > 0 else hr_rest
+        hr_prev = hr_pred[curr_idx] if curr_idx > 0 else hr_start
         hr_pred[curr_idx] = (hr_prev +
                              (hr_ss[curr_idx] - hr_prev) / rate[curr_idx])
 
@@ -35,7 +75,7 @@ def _model(power, hr_rest, hr_max, hr_slope, hr_drift, rate_growth,
 
 def _model_residual(params, heart_rate, power):
     """Residuals between prediction and ground-truth."""
-    return heart_rate - _model(power, *params)
+    return heart_rate - exp_heart_rate_model(power, *params)
 
 
 def _model_residual_least_square(params, heart_rate, power):
@@ -51,15 +91,14 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
     Parameters
     ----------
     solver : string, optional
-        The solver to estimate the model parameters. Can be either 'leastsq' to
-        apply Levenberg-Marquardt or one of 'method' from
-        :func:`scipy.optimize.minimize`.
+        The solver to estimate the model parameters. Choices are
+        {'Levenberg-Marquardt', 'Nelder-Mead', 'L-BFGS-B' (default)}.
 
-    hr_rest : float, default=75
-        Heart-rate frequency of the cyclist at rest.
+    hr_start : float, default=75
+        Initial heart-rate frequency.
 
     hr_max : float, default=200
-        Heart-rate frequency of the cyclist at maximum.
+        Heart-rate frequency of the athlete at maximum.
 
     hr_slope : float, default=0.30
         Slope considered if the model is linear. FIXME
@@ -75,11 +114,11 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
 
     Attributes
     ----------
-    hr_rest_ : float
-        Fitted heart-rate frequency of the cyclist at rest.
+    hr_start_ : float
+        Fitted initial heart-rate frequency.
 
     hr_max_ : float
-        Fitted heart-rate frequency of the cyclist at maximum.
+        Fitted heart-rate frequency of the athlete at maximum.
 
     hr_slope_ : float
         Fitted slope considered if the model is linear. FIXME
@@ -101,15 +140,36 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
 
     """
 
-    def __init__(self, solver='Nelder-Mead', hr_rest=75, hr_max=200,
+    def __init__(self, solver='L-BFGS-B', hr_start=75, hr_max=200,
                  hr_slope=0.30, hr_drift=3e-5, rate_growth=24, rate_decay=30):
         self.solver = solver
-        self.hr_rest = hr_rest
+        self.hr_start = hr_start
         self.hr_max = hr_max
         self.hr_slope = hr_slope
         self.hr_drift = hr_drift
         self.rate_growth = rate_growth
         self.rate_decay = rate_decay
+
+    def _check_inputs(self, X, y=None):
+        """Validate the inputs.
+
+        Check if the inputs are Pandas inputs. Resample with a sampling-rate of
+        1 Hertz.
+
+        """
+        if y is not None:
+            is_df = True if hasattr(X, 'loc') else False
+            if is_df:
+                X_ = X.resample('1s').mean()
+            X_ = check_array(X)
+            return X_, is_df
+        else:
+            is_df = True if hasattr(X, 'loc') and hasattr(y, 'loc') else False
+            if is_df:
+                X_ = X.resample('1s').mean()
+                y_ = y.resample('1s').mean()
+            X_, y_ = check_X_y(X_, y_)
+            return X_, y_, is_df
 
     def fit(self, X, y):
         """Compute the parameters model.
@@ -127,17 +187,19 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
         self
 
         """
-        X, y = check_X_y(X, y, ensure_2d=False)
-        params_init = [self.hr_rest, self.hr_max, self.hr_slope, self.hr_drift,
-                       self.rate_growth, self.rate_decay]
+        power, heart_rate, _ = self._check_inputs(X, y)
+        params_init = [self.hr_start, self.hr_max, self.hr_slope,
+                       self.hr_drift, self.rate_growth, self.rate_decay]
 
-        if self.solver == 'leastsq':
-            res_opt, _ = leastsq(_model_residual, params_init, args=(y, X))
+        if self.solver == 'Levenberg-Marquardt':
+            res_opt, _ = leastsq(_model_residual, params_init,
+                                 args=(heart_rate, power))
         else:
             res_opt = minimize(_model_residual_least_square, params_init,
-                               args=(y, X), method=self.solver)['x']
+                               args=(heart_rate, power),
+                               method=self.solver)['x']
 
-        self.hr_rest_, self.hr_max_, self.hr_slope_, self. hr_drift_, \
+        self.hr_start_, self.hr_max_, self.hr_slope_, self. hr_drift_, \
             self.rate_growth_, self.rate_decay_ = res_opt
 
         return self
@@ -156,9 +218,12 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
             The heart-rate predictions.
 
         """
-        check_is_fitted(self, ['hr_rest_', 'hr_max_', 'hr_slope_', 'hr_drift_',
-                               'rate_growth_', 'rate_decay_'])
-        X = check_array(X, ensure_2d=False)
+        check_is_fitted(self, ['hr_start_', 'hr_max_', 'hr_slope_',
+                               'hr_drift_', 'rate_growth_', 'rate_decay_'])
+        power, is_df = check_array(X)
 
-        return _model(X, self.hr_rest_, self.hr_max_, self.hr_slope_,
-                      self. hr_drift_, self.rate_growth_, self.rate_decay_)
+        hr_pred = exp_heart_rate_model(X, self.hr_start_, self.hr_max_,
+                                       self.hr_slope_, self. hr_drift_,
+                                       self.rate_growth_, self.rate_decay_)
+
+        return pd.Series(hr_pred, index=X.index) if is_df else hr_pred
