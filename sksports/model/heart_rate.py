@@ -164,13 +164,23 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
         """
         if y is None:
             is_df = True if hasattr(X, 'loc') else False
-            X_ = X.resample('1s').mean() if is_df else X
+            X_ = (X.resample('1s').mean()
+                  if is_df and isinstance(X.index, (pd.TimedeltaIndex,
+                                                    pd.DatetimeIndex))
+                  else X)
+
             X_ = check_array(X_)
-            return X_.ravel(), is_df
+            return X_.ravel(), None, is_df
         else:
             is_df = True if hasattr(X, 'loc') and hasattr(y, 'loc') else False
-            X_ = X.resample('1s').mean() if is_df else X
-            y_ = y.resample('1s').mean() if is_df else y
+            X_ = (X.resample('1s').mean()
+                  if is_df and isinstance(X.index, (pd.TimedeltaIndex,
+                                                    pd.DatetimeIndex))
+                  else X)
+            y_ = (y.resample('1s').mean()
+                  if is_df and isinstance(y.index, (pd.TimedeltaIndex,
+                                                    pd.DatetimeIndex))
+                  else y)
             X_, y_ = check_X_y(X_, y_)
             return X_.ravel(), y_, is_df
 
@@ -219,7 +229,7 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
         """
         check_is_fitted(self, ['hr_start_', 'hr_max_', 'hr_slope_',
                                'hr_drift_', 'rate_growth_', 'rate_decay_'])
-        power, is_df = self._check_inputs(X)
+        power, _, is_df = self._check_inputs(X)
 
         hr_pred = exp_heart_rate_model(power, self.hr_start_, self.hr_max_,
                                        self.hr_slope_, self. hr_drift_,
