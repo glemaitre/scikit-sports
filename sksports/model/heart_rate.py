@@ -8,7 +8,7 @@ from __future__ import division
 
 import numpy as np
 import pandas as pd
-from scipy.optimize import leastsq, minimize
+from scipy.optimize import minimize
 
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils import check_X_y, check_array
@@ -22,6 +22,7 @@ def exp_heart_rate_model(power, hr_start, hr_max, hr_slope, hr_drift,
 
     The model used is based on [1]_.
 
+    Read more in the :ref:`User Guide <heartrate_inference>`.
     Parameters
     ----------
     power : ndarray, shape (n_samples,)
@@ -97,6 +98,8 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
     """Estimate the heart-rate from power data.
 
     The model used is based on the formulation in [1]_.
+
+    Read more in the :ref:`User Guide <heartrate_inference>`.
 
     Parameters
     ----------

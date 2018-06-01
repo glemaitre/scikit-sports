@@ -11,10 +11,6 @@ import pandas as pd
 from sksports.model import exp_heart_rate_model
 from sksports.model import HeartRateRegressor
 
-# POWER = np.array([100] * 10 + [240] * 100 + [160] * 100)
-# HEART_RATE = exp_heart_rate_model(POWER, 100, 180, 0.40, 3e-5, 20, 35)
-# HEART_RATE = HEART_RATE + np.random.random(HEART_RATE.size)
-
 
 @pytest.fixture()
 def power_arr():
