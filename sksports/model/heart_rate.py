@@ -23,6 +23,7 @@ def exp_heart_rate_model(power, hr_start, hr_max, hr_slope, hr_drift,
     The model used is based on [1]_.
 
     Read more in the :ref:`User Guide <heartrate_inference>`.
+
     Parameters
     ----------
     power : ndarray, shape (n_samples,)
@@ -35,10 +36,10 @@ def exp_heart_rate_model(power, hr_start, hr_max, hr_slope, hr_drift,
         Heart-rate frequency of the athlete at maximum.
 
     hr_slope : float
-        Slope considered if the model is linear. FIXME
+        Slope considered if the model is linear.
 
     hr_drift : float
-        Attenuation of the heart-rate other time. FIXME
+        Attenuation of the heart-rate other time.
 
     rate_growth : float
         Growth rate of the exponential when the power increases.
@@ -110,10 +111,10 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
         Heart-rate frequency of the athlete at maximum.
 
     hr_slope : float, default=0.30
-        Slope considered if the model is linear. FIXME
+        Slope considered if the model is linear.
 
     hr_drift : float, default=3e-5
-        Attenuation of the heart-rate other time. FIXME
+        Attenuation of the heart-rate other time.
 
     rate_growth : float, default=24
         Growth rate of the exponential when the power increases.

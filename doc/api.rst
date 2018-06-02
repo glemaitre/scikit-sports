@@ -112,7 +112,7 @@ Heart-rate
 
 .. autosummary::
    :toctree: generated/
-   :template: classes.rst
+   :template: class.rst
 
    model.HeartRateRegressor
 
