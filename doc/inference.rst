@@ -6,6 +6,51 @@
 Inference
 =========
 
+.. _heartrate_inference:
+
+Heart-rate inference
+--------------------
+
+Smet et al. [S2015]_ proposes a model to infer heart-rate from power data in
+both cyclists and runners. :func:`exp_heart_rate_model` allows to predict the
+heart-rate based on this model::
+
+  >>> import numpy as np
+  >>> power = np.array([100] * 25 + [240] * 25 + [160] * 25)
+  >>> from sksports.model import exp_heart_rate_model
+  >>> hr_pred = exp_heart_rate_model(power, 100, 180, 0.40, 3e-5, 20, 40)
+  >>> print(hr_pred)  # doctest: +ELLIPSIS
+  [...]
+
+However, this model required parameters which need to be known. The
+:class:`sksports.model.HeartRateRegressor` class provides a functionality to
+learn the parameters on some training data and later on predict the heart-rate
+on some new data::
+
+  >>> from sksports.model import HeartRateRegressor
+  >>> heart_rate = hr_pred  # some training heart-rate associated to the power
+  >>> reg = HeartRateRegressor()
+  >>> reg.get_params()  # doctest: +NORMALIZE_WHITESPACE
+  {'hr_drift': 3e-05, 'hr_max': 200, 'hr_slope': 0.3, 'hr_start': 75,
+   'rate_decay': 30, 'rate_growth': 24}
+  >>> reg.fit(power.reshape(-1, 1), heart_rate)
+  HeartRateRegressor(hr_drift=3e-05, hr_max=200, hr_slope=0.3, hr_start=75,
+            rate_decay=30, rate_growth=24)
+  >>> hr_pred = reg.predict(power.reshape(-1, 1))
+  >>> print(hr_pred)  # doctest: +ELLIPSIS
+  [...]
+
+.. topic:: Examples:
+
+    * :ref:`sphx_glr_auto_examples_model_plot_heart_rate.py`
+
+
+.. topic:: References
+
+   .. [S2015] de Smet, Dimitri, et al. "Heart rate modelling as a potential
+      physical fitness assessment for runners and cyclists." Workshop
+      at ECML & PKDD. 2016.
+
 Power inference
 ---------------
 

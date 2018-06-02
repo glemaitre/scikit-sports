@@ -101,6 +101,21 @@ Power
 
    model.strava_power_model
 
+Heart-rate
+----------
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   model.exp_heart_rate_model
+
+.. autosummary::
+   :toctree: generated/
+   :template: classes.rst
+
+   model.HeartRateRegressor
+
 .. _utils_ref:
 
 Utilities
