@@ -51,5 +51,10 @@ Metrics
 
 Model
 
-- :func:`strava_power_model` implements the method used in Strava for the
+- :func:`model.strava_power_model` implements the method used in Strava for the
   prediction of power from GPS data. By :user:`Guillaume Lemaitre <glemaitre>`.
+
+- :func:`model.exp_heart_rate_model` and :class:`model.HeartRateRegressor`
+  implements a method to predict the heart-rate frequencies from power data,
+  :issue:`6` by :user:`Guillaume Lemaitre <glemaitre>` and
+  :user:`Aart Goossens <AartGoossens>`.
