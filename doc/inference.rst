@@ -40,6 +40,41 @@ on some new data::
   >>> print(hr_pred)  # doctest: +ELLIPSIS
   [...]
 
+.. topic:: Mathematical formulation:
+
+   In [S2015]_, the heart-rate frequency at time :math:`t + 1` is formulated
+   as:
+
+   .. math::
+
+      HR(t+1) = \left\{
+                \begin{array}{ll}
+                  HR(t) + \frac{1}{\tau_r} \left(HR_{ss}(PO(t)) - HR(t) \right), \text{if } HR_{ss}(PO(t)) \geq HR(t)\\
+                  HR(t) + \frac{1}{\tau_f} \left(HR_{ss}(PO(t)) - HR(t) \right), \text{if } HR_{ss}(PO(t)) < HR(t)
+                \end{array}
+              \right.
+
+   where :math:`HR(\cdot)` is the heart-rate, :math:`HR_{ss}(\cdot)` is the
+   steady state heart-rate, :math:`PO(\cdot)` is the power output, and
+   :math:`\tau_r` and :math:`\tau_f` are the growth and decay rate,
+   respectively.
+
+   The steady-state heart-rate :math:`HR_ss(\cdot)` is modeled as a linear
+   function bounded by the maximum heart-rate of cyclist :math:`HR_{max}`. It
+   is defined as:
+
+   .. math::
+
+      HR_{ss}(PO) = \left\{
+                \begin{array}{ll}
+                  HR_{start} + slope \times PO, \text{if } HR_{start} + slope \times PO < HR_{max}\\
+                  HR_{max}, \text{otherwise}
+                \end{array}
+              \right.
+
+   where :math:`HR_{start}` is the initial heart-rate and :math:`slope` is the
+   slope of the linear function.
+  
 .. topic:: Examples:
 
     * :ref:`sphx_glr_auto_examples_model_plot_heart_rate.py`
