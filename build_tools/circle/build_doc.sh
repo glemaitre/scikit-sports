@@ -66,6 +66,15 @@ get_build_type() {
     echo "$filenames"
 }
 
+# Installing required system packages to support the rendering of math
+# notation in the HTML documentation
+sudo -E apt-get -yq update
+sudo -E apt-get -yq remove texlive-binaries --purge
+sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
+     install dvipng texlive-latex-base texlive-latex-extra \
+     texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended\
+     latexmk
+
 build_type=$(get_build_type)
 if [[ "$build_type" =~ ^SKIP ]]
 then
