@@ -38,11 +38,11 @@ data = pd.DataFrame(
 from sksports.model import exp_heart_rate_model
 
 # The function `exp_heart_rate_model` required numpy array
-heart_rate = exp_heart_rate_model(data['power'].values, 75, 200, 0.4, 3e-5,
+heart_rate = exp_heart_rate_model(data['power'].values, 100, 180, 0.4, 3e-5,
                                   15, 40)
 data['heart-rate'] = heart_rate
 data.plot(legend=True)
-plt.title('Simulated power of a cyclist and inferred heart-rate.')
+plt.title('Simulated power of a cyclist and inferred heart-rate')
 
 ###############################################################################
 # The parameters of the :func:`sksports.model.exp_heart_rate_model` are usually
@@ -87,6 +87,7 @@ power.plot(legend=True)
 heart_rate.plot(legend=True)
 heart_rate_initial.plot(legend=True)
 heart_rate_pred.plot(legend=True)
+plt.title('Prediction before and after learning the model parameters')
 
 ###############################################################################
 # Once the parameter fitted, the predictions are actually following the real
