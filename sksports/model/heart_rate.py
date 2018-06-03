@@ -207,10 +207,16 @@ class HeartRateRegressor(BaseEstimator, RegressorMixin):
         power, heart_rate, _ = self._check_inputs(X, y)
         params_init = [self.hr_start, self.hr_max, self.hr_slope,
                        self.hr_drift, self.rate_growth, self.rate_decay]
+        params_bounds = ((40, 140), (140, 220), (0.1, 0.8), (1e-5, 5e-5),
+                         (10, 40), (10, 40))
 
         res_opt = minimize(_model_residual_least_square, params_init,
                            args=(heart_rate, power),
                            method='Nelder-Mead')['x']
+        res_opt = minimize(_model_residual_least_square, res_opt,
+                           args=(heart_rate, power),
+                           method='L-BFGS-B',
+                           bounds=params_bounds)['x']
 
         self.hr_start_, self.hr_max_, self.hr_slope_, self. hr_drift_, \
             self.rate_growth_, self.rate_decay_ = res_opt
